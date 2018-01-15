@@ -1,6 +1,6 @@
 <?php
 
-namespace AJK\Kafka;
+namespace AJK;
 
 class Zookeeper
 {
@@ -20,7 +20,7 @@ class Zookeeper
 	}
 	static public function instance($in_endpoint = null) {
 		if(is_null(self::$instance)) {
-			self::$instance = new \AJK\Kafka\Zookeeper($in_endpoint);
+			self::$instance = new \AJK\Zookeeper($in_endpoint);
 		}
 		return self::$instance;
 	}

@@ -1,5 +1,5 @@
 {
-	"name": "AJK/Kafka",
+	"name": "AJK",
 	"description": "Implements the simple kafka connector",
 	"license": "PHP",
 	"authors": [{
@@ -15,6 +15,6 @@
 		"ext-zookeeper": "*"
 	},
 	"autoload": {
-		"psr-4": { "AJK\\Kakfa\\": "src/" }
+		"psr-4": { "AJK\\": "src/" }
 	}
 }
