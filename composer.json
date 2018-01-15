@@ -1,0 +1,20 @@
+{
+	"name": "Simple Kafka Connector",
+	"description": "Implements the kafka connector",
+	"license": "PHP",
+	"authors": [{
+		"name": "Andy Kirkham",
+		"email": "andy.kirkham@solarwinds.com"
+	}],
+	"require": {
+		"ext-rdkafka": "*",
+		"ext-zookeeper": "*"
+	},
+	"require-dev": {
+		"ext-rdkafka": "*",
+		"ext-zookeeper": "*"
+	},
+	"autoload": {
+		"psr-4": { "AJK\\Kakfa\\": "src/" }
+	}
+}
