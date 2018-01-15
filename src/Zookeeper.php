@@ -30,14 +30,16 @@ class Zookeeper
 			return $brokers;
 		}
 		$children = $this->zoo->getchildren("/brokers/ids");
-		foreach($children as $key => $id) {
-			$result = $this->zoo->get("/brokers/ids/$id");
-			$arr = json_decode($result, true);
-			if(isset($arr['host']) && isset($arr['port'])) {
-				$brokers[] = $arr['host'].':'.$arr['port'];
+		if(is_array($children) && count($children) > 0) {
+			foreach($children as $key => $id) {
+				$result = $this->zoo->get("/brokers/ids/$id");
+				$arr = json_decode($result, true);
+				if(isset($arr['host']) && isset($arr['port'])) {
+					$brokers[] = $arr['host'].':'.$arr['port'];
+				}
 			}
-			return $brokers;
 		}
+		return $brokers;
 	}
 }
 
