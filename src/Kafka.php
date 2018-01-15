@@ -8,7 +8,7 @@ class Kafka
 	private $broker = null;
 	private $topic = null;
 	private function __construct($in_zk_endpoint = null, $in_topic = "test") {
-		$zk = Zookeeper::instance($in_zk_endpoint);
+		$zk = \AJK\Kafka\Zookeeper::instance($in_zk_endpoint);
 		$brokers = $zk->kafka_brokers();
 		if(count($brokers) > 0) {
 			$list = implode(",", $brokers);
@@ -19,7 +19,7 @@ class Kafka
 	}
 	static public function instance($in_zkep = null, $in_topic = "test") {
 		if(is_null(self::$instance)) {
-			self::$instance = new Kafka($in_zkep, $in_topic);
+			self::$instance = new \AJK\Kafka\Kafka($in_zkep, $in_topic);
 		}
 		return self::$instance;
 	}
