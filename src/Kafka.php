@@ -14,7 +14,7 @@ class Kafka
 			$list = implode(",", $brokers);
 			$this->broker = new \RdKafka\Producer();
 			$this->broker->addBrokers($list);
-			$this->topic = $this->broker->newTopic($in_topc);
+			$this->topic = $this->broker->newTopic($in_topic);
 		}
 	}
 	static public function instance($in_zkep = null, $in_topic = "test") {
