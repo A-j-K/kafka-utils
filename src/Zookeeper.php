@@ -26,7 +26,7 @@ class Zookeeper
 	}
 	public function kafka_brokers() {
 		$brokers = array();
-		$children = $this->z->getchildren("/brokers/ids");
+		$children = $this->zoo->getchildren("/brokers/ids");
 		foreach($children as $key => $id) {
 			$result = $this->zoo->get("/brokers/ids/$id");
 			$arr = json_decode($result, true);
