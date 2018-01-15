@@ -1,6 +1,6 @@
 {
-	"name": "Simple Kafka Connector",
-	"description": "Implements the kafka connector",
+	"name": "AJK/Kafka",
+	"description": "Implements the simple kafka connector",
 	"license": "PHP",
 	"authors": [{
 		"name": "Andy Kirkham",
