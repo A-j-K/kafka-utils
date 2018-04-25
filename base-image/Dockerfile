@@ -3,15 +3,17 @@ FROM debian:stretch-slim
 ENV	POCO_VER="1.9.0" \
 	RDKAFKA_VERSION="0.11.4" \
  	AWS_SDK_CPP_VERSION="1.4.37" \
-	YAML_CPP_VER="0.6.2"
+	YAML_CPP_VER="0.6.2" \
+	GTEST_VER="1.8.0" \
+	CMAKE_VER="3.11" \
+	CMAKE_VERSION="3.11.1"
 
 ENV DEPS_BUILD_TOOLS \
 	build-essential \
 	autoconf \
 	g++ \
 	gcc \
-	make \
-	cmake
+	make 
 
 ENV DEPS_DEV_TOOLS \
 	apt-utils \
@@ -27,6 +29,8 @@ ENV DEPS_DEV_TOOLS \
 
 ENV DEPS \
 	curl \
+	tar \
+	python \
 	ca-certificates \
 	libargon2-0-dev \
 	libc-dev \
@@ -54,6 +58,20 @@ RUN	DEBIAN_FRONTEND=noninteractive apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -y \
 		$DEPS $DEPS_DEV_TOOLS $DEPS_BUILD_TOOLS --no-install-recommends \
 	&& mkdir -p /tmp/build && cd /tmp/build \
+	&& curl -sSL https://cmake.org/files/v${CMAKE_VER}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+	&& tar -v -zxf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+	&& rm -f cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+	&& cd cmake-${CMAKE_VERSION}-Linux-x86_64 \
+	&& cp -rp bin/* /usr/local/bin/ \
+	&& cp -rp share/* /usr/local/share/ \
+	&& cd /tmp && rm -rf build \
+	&& mkdir -p /tmp/build && cd /tmp/build \
+	&& curl -sSL https://github.com/google/googletest/archive/release-${GTEST_VER}.zip > gtest.zip \
+	&& unzip gtest.zip && rm -f gtest.zip \
+	&& cd googletest-release-${GTEST_VER} && mkdir build && cd build \
+	&& cmake .. && make && make install \
+	&& cd /tmp && rm -rf build \
+	&& mkdir -p /tmp/build && cd /tmp/build \
 	&& curl -sSL https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-${YAML_CPP_VER}.zip > yaml-cpp.zip \
 	&& unzip yaml-cpp.zip && rm -f yaml-cpp.zip \
 	&& cd yaml-cpp-yaml-cpp-${YAML_CPP_VER} \
@@ -62,7 +80,6 @@ RUN	DEBIAN_FRONTEND=noninteractive apt-get update \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DBUILD_SHARED_LIBS=ON \
 		-DYAML_CPP_BUILD_TESTS=OFF \
-		-DCMAKE_WARN_DEPRECATED=FALSE \
 	&& make && make install \
 	&& cd /tmp && rm -rf build \
 	&& mkdir -p /tmp/build && cd /tmp/build \
@@ -84,26 +101,25 @@ RUN	DEBIAN_FRONTEND=noninteractive apt-get update \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
 		-DENABLE_DATA_ODBC=Off \
-		-DCMAKE_WARN_DEPRECATED=FALSE \
 	&& make && make install \
-	&& cd /tmp && rm -rf build \
-	&& mkdir -p /tmp/build && cd /tmp/build \
-	&& curl -sSL https://github.com/aws/aws-sdk-cpp/archive/${AWS_SDK_CPP_VERSION}.zip > aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
-	&& unzip aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
-	&& rm -f aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
-	&& cd aws-sdk-cpp-${AWS_SDK_CPP_VERSION} && mkdir build && cd build \
-	&& cmake .. \
-                -DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_ONLY="sqs;s3;transfer;dynamodb;s3-encryption;apigateway" \
-                -DENABLE_TESTING=OFF \
-                -DAUTORUN_UNIT_TESTS=OFF \
-                -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
-		-DCMAKE_WARN_DEPRECATED=FALSE \
-        && make \
-        && make install \
-	&& cd /tmp && rm -rf build \
+	&& cd /tmp && rm -rf build 
 	&& DEBIAN_FRONTEND=noninteractive apt-get remove -y $DEPS_BUILD_TOOLS $DEPS_TOOLS \
 	&& DEBIAN_FRONTEND=noninteractive apt -y autoremove \
 	&& rm -r /var/lib/apt/lists/*
+
+#	&& mkdir -p /tmp/build && cd /tmp/build \
+#	&& curl -sSL https://github.com/aws/aws-sdk-cpp/archive/${AWS_SDK_CPP_VERSION}.zip > aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
+#	&& unzip aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
+#	&& rm -f aws-sdk-cpp-${AWS_SDK_CPP_VERSION}.zip \
+#	&& cd aws-sdk-cpp-${AWS_SDK_CPP_VERSION} && mkdir build && cd build \
+#	&& cmake .. \
+#               -DCMAKE_BUILD_TYPE=Release \
+#		-DBUILD_ONLY="sqs;s3;transfer;dynamodb;s3-encryption;apigateway" \
+#                -DENABLE_TESTING=OFF \
+#                -DAUTORUN_UNIT_TESTS=OFF \
+#                -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
+#        && make \
+#        && make install \
+#	&& cd /tmp && rm -rf build \
 
 
