@@ -13,6 +13,7 @@ public:
 	typedef std::vector<std::string> StringVector;
 
 protected:
+	bool _verified;
 	KeyValue _options;
 	StringVector _brokers;
 
@@ -24,6 +25,10 @@ public:
 	virtual KeyValue& getClientOptions(void) {
 		return _options;
 	}	
+
+	virtual bool getVerified(void) {
+		return _verified;
+	}
 };
 
 

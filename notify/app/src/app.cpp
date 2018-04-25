@@ -5,7 +5,6 @@
 #include <Poco/Util/AbstractConfiguration.h>
 #include <Poco/AutoPtr.h>
 
-
 using Poco::Util::Option;
 using Poco::Util::HelpFormatter;
 using Poco::Util::AbstractConfiguration;
@@ -95,13 +94,7 @@ int
 App::loadConfigFile(const std::string &filename)
 {
 	_pConfig = ConfigFactory::loadFromFile(filename);
-	//JsonConfig *p = new JsonConfig();
-	//if(p) {
-	//	p->loadFromFile(file);
-	//	_pConfig = p;
-		return 0;
-	//}
-	//return -1;
+	return 0;
 }
 
 int 
@@ -110,7 +103,7 @@ App::main(const ArgVec &args)
 	if(_helpRequested) {
 		return Application::EXIT_OK;
 	}
-	if(!_pConfig) {
+	if(_pConfig == nullptr) {
 		if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
 			return Application::EXIT_CONFIG;
 		}
