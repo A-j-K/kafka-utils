@@ -6,6 +6,7 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
 SET(kafka_notify_SRCS
 	app.cpp
+	config/jsonconfig.cpp
 )
 
 ADD_EXECUTABLE(kafka_notify

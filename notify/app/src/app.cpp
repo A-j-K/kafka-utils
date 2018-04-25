@@ -10,7 +10,7 @@
 #include <Poco/AutoPtr.h>
 
 #include "app.hpp"
-#include "config/config.hpp"
+#include "config/jsonconfig.hpp"
 
 using Poco::Util::Application;
 using Poco::Util::Option;
@@ -24,14 +24,13 @@ class App: public Application
 {
 private:
 	bool _helpRequested;
-	bool _configLoaded;
-	Config _config;
+	Config *_pConfig;
 
 public:
 
 	App(): 
 		_helpRequested(false),
-		_configLoaded(false)
+		_pConfig(0)
 	{}
 
 protected:
@@ -44,6 +43,7 @@ protected:
 
 	void uninitialize()
 	{
+		if(_pConfig) delete _pConfig;
 		Application::uninitialize();
 	}
 
@@ -79,9 +79,7 @@ protected:
 
 	void handleConfig(const std::string &name, const std::string &value)
 	{
-		if(loadConfigFile(value) == 0) {
-			_configLoaded = true;
-		}
+		loadConfigFile(value);
 	}
 
 	void displayHelp()
@@ -95,7 +93,13 @@ protected:
 
 	int loadConfigFile(const std::string &file)
 	{
-		return 0;
+		JsonConfig *p = new JsonConfig();
+		if(p) {
+			p->loadFromFile(file);
+			_pConfig = p;
+			return 0;
+		}
+		return -1;
 	}
 
 	int main(const ArgVec &args)
@@ -104,7 +108,7 @@ protected:
 			return Application::EXIT_OK;
 		}
 
-		if(!_configLoaded) {
+		if(!_pConfig) {
 			if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
 				return Application::EXIT_CONFIG;
 			}
