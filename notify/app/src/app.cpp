@@ -1,127 +1,124 @@
 
-#include <sstream>
-#include <iostream>
-
-#include <Poco/Util/Application.h>
+#include "app.hpp"
 #include <Poco/Util/Option.h>
-#include <Poco/Util/OptionSet.h>
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/AbstractConfiguration.h>
 #include <Poco/AutoPtr.h>
 
-#include "app.hpp"
-#include "config/jsonconfig.hpp"
 
-using Poco::Util::Application;
 using Poco::Util::Option;
-using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 using Poco::Util::AbstractConfiguration;
 using Poco::Util::OptionCallback;
 using Poco::AutoPtr;
 
-class App: public Application
+App::App(): 
+	_daemonize(false),
+	_helpRequested(false),
+	_pConfig(0)
+{}
+
+void
+App::initialize(Application &self)
 {
-private:
-	bool _helpRequested;
-	Config *_pConfig;
+	loadConfiguration();
+	Application::initialize(self);
+}
 
-public:
+void
+App::uninitialize()
+{
+	Application::uninitialize();
+}
 
-	App(): 
-		_helpRequested(false),
-		_pConfig(0)
-	{}
+void 
+App::reinitialize(Application &self)
+{
+	Application::reinitialize(self);
+}
 
-protected:
+void 
+App::defineOptions(OptionSet &options)
+{
+	Application::defineOptions(options);
+	options.addOption(
+		Option("help", "h", "Display help")
+			.required(false)
+			.repeatable(false)
+			.callback(OptionCallback<App>(this, &App::handleHelp))
+	);
+	options.addOption(
+		Option("daemonize", "d", "Daemonize program")
+			.required(false)
+			.repeatable(false)
+			.callback(OptionCallback<App>(this, &App::handleDaemonize))
+	);
+	options.addOption(
+		Option("conf-file", "f", "Load configuration data from file")
+			.required(false)
+			.repeatable(true)
+			.argument("json-file")
+			.callback(OptionCallback<App>(this, &App::handleConfig))
+	);
+}
 
-	void initialize(Application &self)
-	{
-		loadConfiguration();
-		Application::initialize(self);
-	}
+void 
+App::handleHelp(const std::string &name, const std::string &value)
+{
+	_helpRequested = true;
+	displayHelp();
+	stopOptionsProcessing();
+}
 
-	void uninitialize()
-	{
-		if(_pConfig) delete _pConfig;
-		Application::uninitialize();
-	}
+void 
+App::handleConfig(const std::string &name, const std::string &value)
+{
+	loadConfigFile(value);
+}
 
-	void reinitialize(Application &self)
-	{
-		Application::reinitialize(self);
-	}
+void 
+App::handleDaemonize(const std::string &name, const std::string &value)
+{
+	_daemonize = true;
+}
 
-	void defineOptions(OptionSet &options)
-	{
-		Application::defineOptions(options);
-		options.addOption(
-			Option("help", "h", "Display help")
-				.required(false)
-				.repeatable(false)
-				.callback(OptionCallback<App>(this, &App::handleHelp))
-		);
-		options.addOption(
-			Option("conf-file", "f", "Load configuration data from file")
-				.required(false)
-				.repeatable(true)
-				.argument("yaml-file")
-				.callback(OptionCallback<App>(this, &App::handleConfig))
-		);
-	}
+void 
+App::displayHelp()
+{
+	HelpFormatter helpFormatter(options());
+	helpFormatter.setCommand(commandName());
+	helpFormatter.setUsage("OPTIONS");
+	helpFormatter.format(std::cout);
+}
 
-	void handleHelp(const std::string &name, const std::string &value)
-	{
-		_helpRequested = true;
-		displayHelp();
-		stopOptionsProcessing();
-	}
+int 
+App::loadConfigFile(const std::string &filename)
+{
+	_pConfig = ConfigFactory::loadFromFile(filename);
+	//JsonConfig *p = new JsonConfig();
+	//if(p) {
+	//	p->loadFromFile(file);
+	//	_pConfig = p;
+		return 0;
+	//}
+	//return -1;
+}
 
-	void handleConfig(const std::string &name, const std::string &value)
-	{
-		loadConfigFile(value);
-	}
-
-	void displayHelp()
-	{
-		HelpFormatter helpFormatter(options());
-		helpFormatter.setCommand(commandName());
-		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Kafka Notify");
-		helpFormatter.format(std::cout);
-	}
-
-	int loadConfigFile(const std::string &file)
-	{
-		JsonConfig *p = new JsonConfig();
-		if(p) {
-			p->loadFromFile(file);
-			_pConfig = p;
-			return 0;
-		}
-		return -1;
-	}
-
-	int main(const ArgVec &args)
-	{
-		if(_helpRequested) {
-			return Application::EXIT_OK;
-		}
-
-		if(!_pConfig) {
-			if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
-				return Application::EXIT_CONFIG;
-			}
-		}
-
-		std::cout << "Hello World\n";
+int 
+App::main(const ArgVec &args)
+{
+	if(_helpRequested) {
 		return Application::EXIT_OK;
-
+	}
+	if(!_pConfig) {
+		if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
+			return Application::EXIT_CONFIG;
+		}
 	}
 
+	std::cout << "Hello World\n";
+	return Application::EXIT_OK;
 
-};
-
-POCO_APP_MAIN(App)
+}
 
 

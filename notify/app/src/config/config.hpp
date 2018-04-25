@@ -3,10 +3,12 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 class Config
 {
 public:
+	typedef std::shared_ptr<Config> ShPtr;
 	typedef std::map<std::string, std::string> KeyValue;
 	typedef std::vector<std::string> StringVector;
 
