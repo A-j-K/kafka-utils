@@ -4,29 +4,39 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
 
 ENABLE_TESTING()
 FIND_PACKAGE(GTest REQUIRED)
+FIND_PACKAGE(GMock REQUIRED)
 
 INCLUDE_DIRECTORIES(
 	"${GTEST_INCLUDE_DIRS}"
+	"${GMOCK_INCLUDE_DIRS}"
 	"${PROJECT_SOURCE_DIR}/src"
 )
 
-FILE(GLOB libnotify_test_SRCS
+FILE(GLOB notify_test_SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/test-*.cpp"
 )
 
-ADD_EXECUTABLE(libnotify_tests
-	${libnotify_test_SRCS}
+#MESSAGE(STATUS "Sources: ${notify_test_SRCS}")
+
+ADD_EXECUTABLE(notify_tests
+	${notify_test_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(libnotify_tests
-	gtest
-	gtest_main
+TARGET_LINK_LIBRARIES(notify_tests
+	notify
 	pthread
-	libnotify
+	${GTEST_LIBRARIES}
+	${GTEST_MAIN_LIBRARIES}
+	${GMOCK_LIBRARIES}
 )
 
 ADD_TEST(
 	NAME "test-jsonconfig"
-	COMMAND $<TARGET_FILE:libnotify_tests>
+	COMMAND $<TARGET_FILE:notify_tests>
 )
+ADD_TEST(
+	NAME "test-pipe"
+	COMMAND $<TARGET_FILE:notify_tests>
+)
+
 

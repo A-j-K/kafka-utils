@@ -52,6 +52,7 @@ ENV DEPS \
 	zlib1g-dev \
 	libsodium-dev \
 	libmbedtls-dev \
+	libjansson-dev \
 	libyaml-dev
 
 RUN	DEBIAN_FRONTEND=noninteractive apt-get update \

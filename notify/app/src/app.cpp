@@ -17,6 +17,22 @@ App::App():
 	_pConfig(0)
 {}
 
+int 
+App::main(const ArgVec &args)
+{
+	if(_helpRequested) {
+		return Application::EXIT_OK;
+	}
+	if(_pConfig == nullptr) {
+		if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
+			return Application::EXIT_CONFIG;
+		}
+	}
+
+	std::cout << "Hello World\n";
+	return Application::EXIT_OK;
+}
+
 void
 App::initialize(Application &self)
 {
@@ -93,25 +109,8 @@ App::displayHelp()
 int 
 App::loadConfigFile(const std::string &filename)
 {
-	_pConfig = ConfigFactory::loadFromFile(filename);
+	_pConfig = ConfigFactory::getConfigByFile(filename);
 	return 0;
-}
-
-int 
-App::main(const ArgVec &args)
-{
-	if(_helpRequested) {
-		return Application::EXIT_OK;
-	}
-	if(_pConfig == nullptr) {
-		if(loadConfigFile(std::string(APP_DEFAULT_CONFIG_FILE)) != 0) {
-			return Application::EXIT_CONFIG;
-		}
-	}
-
-	std::cout << "Hello World\n";
-	return Application::EXIT_OK;
-
 }
 
 

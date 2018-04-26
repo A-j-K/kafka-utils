@@ -6,7 +6,10 @@ class ConfigFactory
 {
 public:
 	static Config::ShPtr
-	loadFromFile(const std::string &filename); 
+	getConfigByFile(const std::string &filename); 
+
+	static Config::ShPtr
+	getConfigByJsonString(const std::string &json); 
 };
 
 
