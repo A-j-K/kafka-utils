@@ -18,6 +18,7 @@ public:
 	virtual void SetUp() {
 		PipeEntry::ShPtr spEntry;
 		_spPipe = Pipe::ShPtr(new mock_pipe);
+		_spPipe->setMaxCount(1, Pipe::BLOCKING, NULL);
 		spEntry = PipeEntry::ShPtr(new PipeEntry);
 		_spPipe->pushBack(spEntry);
 	}

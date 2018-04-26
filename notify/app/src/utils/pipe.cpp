@@ -25,18 +25,25 @@ PipeEntry::getMessagePtr(void)
 bool 
 Pipe::pushBack(PipeEntry::ShPtr entry, bool try_lock)
 {
+	bool rval = false;
 	if(try_lock) {
 		if(_mutex.try_lock()) {
-			_queue.push(entry);
+			if(_queue.size() < _maxCount) {
+				_queue.push(entry);
+				rval = true;
+			}
 			_mutex.unlock();
-			return true;
+			return rval;
 		}
-		return false;
+		return rval;
 	}
 	_mutex.lock();
-	_queue.push(entry);
+	if(_queue.size() < _maxCount) {
+		_queue.push(entry);
+		rval = true;
+	}
 	_mutex.unlock();
-	return true;
+	return rval;
 }
 
 PipeEntry::ShPtr 
@@ -102,4 +109,24 @@ Pipe::getSize(bool try_lock, bool *result)
 	_mutex.unlock();
 	if(result) *result = true;
 	return rval;
+}
+
+Pipe& 
+Pipe::setMaxCount(int max, bool try_lock, bool *result)
+{
+	if(try_lock) {
+		if(_mutex.try_lock()) {
+			_maxCount = max;
+			_mutex.unlock();
+			if(result) *result = true;
+			return *this;
+		}
+		if(result) *result = false;
+		return *this;
+	}
+	_mutex.lock();
+	_maxCount = max;
+	_mutex.unlock();
+	if(result) *result = true;
+	return *this;
 }
