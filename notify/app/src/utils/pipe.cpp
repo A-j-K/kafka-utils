@@ -52,6 +52,7 @@ Pipe::popFront(bool try_lock, bool *result)
 			return sp;
 		}
 		if(result) *result = false;
+		return sp;
 	}
 	_mutex.lock();
 	sp = _queue.front();
@@ -93,7 +94,8 @@ Pipe::getSize(bool try_lock, bool *result)
 			if(result) *result = true;
 			return rval;
 		}
-		if(result) *result = true;
+		if(result) *result = false;
+		return -1;
 	}
 	_mutex.lock();
 	rval = _queue.size();
