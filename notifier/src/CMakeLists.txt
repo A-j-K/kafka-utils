@@ -1,11 +1,12 @@
 
 
 SET(libnotify_SRCS
+	curler.cpp
 	callback.cpp
-	utils/pipe.cpp
-	config/config.cpp
-	config/configfactory.cpp
-	config/jsonconfig.cpp
+	pipe.cpp
+	absconfig.cpp
+	configfactory.cpp
+	jsonconfig.cpp
 )
 
 ADD_LIBRARY(notifier_lib

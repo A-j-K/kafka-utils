@@ -1,49 +1,83 @@
 
-#include <sstream>
+#include <curl/curl.h>
 
 #include "callback.hpp"
 
 Callback::Callback()
 {}
 
-Callback::Callback(Config::ShPtr &config):
-	_pConfig(config)
-{
-	curl_global_init(CURL_GLOBAL_ALL);
-	_pCurl = curl_easy_init();
-	curl_easy_setopt(_pCurl, CURLOPT_NOSIGNAL, 1L);
-	curl_easy_setopt(_pCurl, CURLOPT_NOPROGRESS, 1L);
-	curl_easy_setopt(_pCurl, CURLOPT_VERBOSE, 0L);
-	_pInputPipe = Pipe::ShPtr(new Pipe);
-	_thread = ThreadShPtr(new std::thread(Callback::static_run, this));
-}
+Callback::Callback(AbsConfig::ShPtr &config):
+	_pConfig(config),
+	_pCurler(Curler::ShPtr(new Curler(config))),
+	_pInputPipe(Pipe::ShPtr(new Pipe)),
+	_pThread(ThreadShPtr(new std::thread(Callback::static_run, this)))
+{}
+
+Callback::Callback(
+	AbsConfig::ShPtr &config,
+	Curler::ShPtr &curler
+):
+	_pConfig(config),
+	_pCurler(curler)
+{}
 
 Callback::~Callback()
 {
-	if(_pCurl) {
-		curl_easy_cleanup(_pCurl);
-	}
-	curl_global_cleanup();
+}
+
+void 
+Callback::static_run(Callback *self)
+{
+	self->run();
+}
+
+CurlerRval::ShPtr
+Callback::send(PipeEntry::ShPtr& spEntry)
+{
+	CurlerRval::ShPtr spResult;
+	std::stringstream oss;
+	const RdKafka::Message *pMsg = spEntry->getMessagePtr();
+	curl_slist *pHeaders = NULL;
+	oss << "X-Kafka-Msg-Key: " << pMsg->key();
+	pHeaders = curl_slist_append(pHeaders, oss.str().c_str()); 
+	oss.str(""); 
+	oss.clear();
+	oss << "X-Kafka-Topic: " << pMsg->topic_name();
+	pHeaders = curl_slist_append(pHeaders, oss.str().c_str()); 
+	oss.str(""); 
+	oss.clear();
+	oss << "X-Kafka-Partition: " << pMsg->partition();
+	pHeaders = curl_slist_append(pHeaders, oss.str().c_str()); 
+	spResult = _pCurler->send((char*)pMsg->payload(), pMsg->len(), pHeaders);
+	curl_slist_free_all(pHeaders);
+	return spResult;
 }
 
 void
-Callback::static_run(Callback *self) 
+Callback::run() 
 {
-	bool keep = true;
-	while(keep) {
+	bool loop_control = true;
+	while(loop_control) {
 		PipeEntry::ShPtr spEntry;
-		Config::KeyValue headers;
-		spEntry = self->_pInputPipe->popFront(Pipe::BLOCKING, NULL);
-		headers = self->_pConfig->getRequestHeaders();
-		// https://curl.haxx.se/libcurl/c/curl_easy_setopt.html
-		curl_easy_setopt(self->_pCurl, CURLOPT_URL, self->_pConfig->getApiUrl().c_str());
-		curl_easy_setopt(self->_pCurl, CURLOPT_HEADER, "Connection: keep-alive");
-		Config::KeyValue::iterator itor = headers.begin();
-		while(itor != headers.end()) {
-			std::stringstream oss;
-			oss << itor->first << ": " << itor->second;
-			curl_easy_setopt(self->_pCurl, CURLOPT_HEADER, oss.str().c_str());
-		}
+		CurlerRval::ShPtr spResult;
+		spEntry = _pInputPipe->popFront(Pipe::BLOCKING, NULL);
+		PipeEntry::msgType type = spEntry->getType();
+		switch(type) {
+			case PipeEntry::eTHREAD_TERM: 
+				loop_control = false;
+				break;
 
+			case PipeEntry::eKAFKA_MSG: 
+				spResult = send(spEntry);
+				if(spResult->_result != CURLE_OK) {
+					// Handle error
+				}
+				break;
+
+			default:
+				break;
+		}
 	}
 }
+
+

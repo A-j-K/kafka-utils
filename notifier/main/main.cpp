@@ -10,8 +10,9 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <exception>
 
-#include "config/configfactory.hpp"
+#include "configfactory.hpp"
 
 #include "callback.hpp"
 
@@ -33,7 +34,7 @@ should_daemonize(int argc, char **argv)
 int
 main(int argc, char *argv[])
 {
-	Config::ShPtr pConfig;
+	AbsConfig::ShPtr pConfig;
 	Callback::ShPtr pCallback;
 
 	if(should_daemonize(argc, argv)) {
@@ -44,8 +45,14 @@ main(int argc, char *argv[])
 		}
 	}
 
-	pConfig = ConfigFactory::getConfigByFile(std::string("/etc/notifier.json"));
-	pCallback = Callback::ShPtr(new Callback(pConfig));	
+	try {
+		pConfig = ConfigFactory::getConfigByFile(std::string("/etc/notifier.json"));
+		pCallback = Callback::ShPtr(new Callback(pConfig));	
+	}
+	catch(std::exception e) {
+		std::cout << e.what();
+		return -1;
+	}
 	
 	printf("Hello World\n");
 	return 0;

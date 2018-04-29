@@ -16,16 +16,37 @@ JsonConfig::load(json_t *pjsonconfig)
 }
 
 void
+JsonConfig::load_consumer(json_t *pjsonconfig)
+{
+	json_t *pconsumer, *pgroup;
+	if((pconsumer = json_object_get(pjsonconfig, "consumer")) != NULL) {
+		if((pgroup = json_object_get(pconsumer, "group")) != NULL) {
+			_consumerGroup = std::string(json_string_value(pgroup));
+		}
+		load_consumer_brokers(json_object_get(pconsumer, "brokers"));
+		load_consumer_options(json_object_get(pconsumer, "options"));
+		load_consumer_topic(json_object_get(pconsumer, "topic"));
+	}
+	else {
+		throw std::invalid_argument("consumer not found");
+	}
+}
+
+void
 JsonConfig::load_consumer_brokers(json_t *pjsonbrokers)
 {
+	int broker_count = 0;
 	if(pjsonbrokers && json_is_array(pjsonbrokers)) {
 		size_t index;
 		json_t *pvalue;
 		json_array_foreach(pjsonbrokers, index, pvalue) {
 			const char *pstr = json_string_value(pvalue);
-			std::string s(pstr);
-			_brokers.push_back(s);	
+			_brokers.push_back(std::string(pstr));	
+			broker_count++;
 		}
+	}
+	if(broker_count == 0) {	
+		throw std::invalid_argument("No brokers supplied");
 	}
 }
 
@@ -37,13 +58,12 @@ JsonConfig::load_consumer_options(json_t *pjsonoptions)
 		json_t *pvalue;
 		json_array_foreach(pjsonoptions, index, pvalue) {
 			if(json_is_object(pvalue)) {
-				json_t *p1, *p2;
-				p1 = json_object_get(pvalue, "name");
-				p2 = json_object_get(pvalue, "value");
+				json_t
+				  *p1 = json_object_get(pvalue, "name"),
+				  *p2 = json_object_get(pvalue, "value");
 				if(p1 && json_is_string(p1) && p2 && json_is_string(p2)) {
-					std::string s1(json_string_value(p1));
-					std::string s2(json_string_value(p2));
-					_options[s1] = s2;
+					_options[ std::string(json_string_value(p1)) ] = 
+						std::string(json_string_value(p2));
 				}
 			}
 		}	
@@ -53,41 +73,22 @@ JsonConfig::load_consumer_options(json_t *pjsonoptions)
 void
 JsonConfig::load_consumer_topic(json_t *pjsontopic)
 {
+	int topic_count = 0;
 	if(pjsontopic && json_is_object(pjsontopic)) {
 		json_t *p = json_object_get(pjsontopic, "name");
 		if(p && json_is_string(p)) {
-			std::string s(json_string_value(p));
-			_topic = s;
+			_topic = std::string(json_string_value(p));
+			topic_count++;
 		}
-		else {
-			throw std::invalid_argument("No topic name supplied");
-		}
+		_partition = 0; // Default to partition zero, unless...
 		p = json_object_get(pjsontopic, "partition");
 		if(p && json_is_integer(p)) {
 			_partition = (int)json_integer_value(p);
 		}
 	}
-}
-
-void
-JsonConfig::load_consumer(json_t *pjsonconfig)
-{
-	json_t *ptop, *ptemp;
-
-	if((ptop = json_object_get(pjsonconfig, "consumer")) == NULL) {
-		throw std::invalid_argument("consumer not found");
+	if(topic_count == 0) {
+		throw std::invalid_argument("No topic name supplied");
 	}
-	ptemp = json_object_get(ptop, "group");
-	if(ptemp && json_is_string(ptemp)) {
-		std::string s(json_string_value(ptemp));
-		_consumerGroup = s;	
-	}
-	ptemp = json_object_get(ptop, "brokers");
-	load_consumer_brokers(ptemp);
-	ptemp = json_object_get(ptop, "options");
-	load_consumer_options(ptemp);
-	ptemp = json_object_get(ptop, "topic");
-	load_consumer_topic(ptemp);
 }
 
 void
@@ -95,34 +96,45 @@ JsonConfig::load_callback(json_t *pjsonconfig)
 {
 	json_t *ptop, *ptemp;
 
-	if((ptop = json_object_get(pjsonconfig, "callback")) == NULL) {
+	if(!(ptop = json_object_get(pjsonconfig, "callback"))) {
 		throw std::invalid_argument("callback not found");
 	}
-	ptemp = json_object_get(ptop, "expect_response_code");
-	if(ptemp && json_is_integer(ptemp)) {
-		_expectResponseCode = json_integer_value(ptemp);
-	}
-	ptemp = json_object_get(ptop, "url");
-	if(ptemp && json_is_string(ptemp)) {
-		std::string s(json_string_value(ptemp));
-		_apiUrl = s;
+	if((ptemp = json_object_get(ptop, "url")) && json_is_string(ptemp)) {
+		_apiUrl = std::string(json_string_value(ptemp));
 	}
 	else {
 		throw std::invalid_argument("No callback URL supplied");
 	}
-	ptemp = json_object_get(ptop, "headers");
-	if(ptemp && json_is_array(ptemp)) { // Headers are optional.
+	if((ptemp = json_object_get(ptop, "expect_response_code")) && json_is_integer(ptemp)) {
+		_expectResponseCode = json_integer_value(ptemp);
+	}
+	else {
+		_expectResponseCode = 200;
+	}
+	if((ptemp = json_object_get(ptop, "httpverb")) && json_is_string(ptemp)) {
+		_httpVerb = std::string(json_string_value(ptemp));
+	}
+	else {
+		_httpVerb = std::string("PUT");
+	}
+	if((ptemp = json_object_get(ptop, "content-type")) && json_is_string(ptemp)) {
+		std::string s(json_string_value(ptemp));
+		_contentType = s;
+	}
+	else {
+		_contentType = std::string("application/octet-stream");
+	}
+	if((ptemp = json_object_get(ptop, "headers")) && json_is_array(ptemp)) {
 		size_t index;
 		json_t *pvalue;
 		json_array_foreach(ptemp, index, pvalue) {
 			if(json_is_object(pvalue)) {
-				json_t *p1, *p2;
-				p1 = json_object_get(pvalue, "name");
-				p2 = json_object_get(pvalue, "value");
+				json_t 
+				  *p1 = json_object_get(pvalue, "name"), 
+				  *p2 = json_object_get(pvalue, "value");
 				if(p1 && json_is_string(p1) && p2 && json_is_string(p2)) {
-					std::string s1(json_string_value(p1));
-					std::string s2(json_string_value(p2));
-					_requestHeaders[s1] = s2;
+					_requestHeaders[ std::string(json_string_value(p1)) ] = 
+						std::string(json_string_value(p2));
 				}
 			}
 		}

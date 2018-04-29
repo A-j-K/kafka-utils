@@ -5,10 +5,10 @@
 #include <vector>
 #include <memory>
 
-class Config
+class AbsConfig
 {
 public:
-	typedef std::shared_ptr<Config> ShPtr;
+	typedef std::shared_ptr<AbsConfig> ShPtr;
 	typedef std::map<std::string, std::string> KeyValue;
 	typedef std::vector<std::string> StringVector;
 
@@ -16,7 +16,7 @@ public:
 protected:
 	bool _verified;
 public:
-	Config(); 
+	AbsConfig(); 
 	virtual bool getVerified(void) { return _verified; }
 
 // Broker definition API
@@ -38,12 +38,15 @@ public:
 protected:
 	int _expectResponseCode;
 	std::string _apiUrl;
+	std::string _httpVerb;
+	std::string _contentType;
 	KeyValue _requestHeaders;
 public:
 	virtual int getExpectResponseCode(void) { return _expectResponseCode; }
 	virtual const std::string& getApiUrl(void) { return _apiUrl; }	
 	virtual const KeyValue& getRequestHeaders(void) { return _requestHeaders; }
-
+	virtual const std::string getHttpVerb(void) { return _httpVerb; }
+	virtual const std::string getContentType(void) { return _contentType; }
 };
 
 

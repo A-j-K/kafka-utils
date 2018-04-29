@@ -2,7 +2,7 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "config/configfactory.hpp"
+#include "configfactory.hpp"
 
 static const char 
 *ptest_str = R"END(
@@ -18,22 +18,19 @@ static const char
 			"partition": 10
 		},
 		"options": [
-			{ "name": "security.mechanism",
-			  "value": "sasl_ssl" },
-			{ "name": "sasl_username",
-			  "value": "testuser" },
-			{ "name": "sasl_password",
-			  "value": "testpass" }
+			{ "name": "security.mechanism", "value": "sasl_ssl" },
+			{ "name": "sasl_username",      "value": "testuser" },
+			{ "name": "sasl_password",      "value": "testpass" }
 		]
 	},
 	"callback": {
 		"url": "https://bar.com/baz",
+		"httpverb": "POST",
+		"content-type": "application/JSON",
 		"expect_response_code": 200,
 		"headers": [
-			{ "name": "X-Request-1", 
-			  "value": "humbug-1" },
-			{ "name": "X-Request-2", 
-			  "value": "humbug-2" }
+			{ "name": "X-Request-1", "value": "humbug-1" },
+			{ "name": "X-Request-2", "value": "humbug-2" }
 		]
 	}
 }
@@ -42,7 +39,7 @@ static const char
 class test_jsonconfig : public ::testing::Test
 {
 public:
-	Config::ShPtr _spConfig;
+	AbsConfig::ShPtr _spConfig;
 	virtual void SetUp() {
 		std::string s(ptest_str);
 		_spConfig = ConfigFactory::getConfigByJsonString(s);
@@ -61,10 +58,10 @@ TEST_F(test_jsonconfig, consumer_group)
 
 TEST_F(test_jsonconfig, consumer_brokers)
 {
-	Config::StringVector expect;
+	AbsConfig::StringVector expect;
 	expect.push_back(std::string("foo-1.com:443"));
 	expect.push_back(std::string("foo-2.com:443"));
-	Config::StringVector brokers = _spConfig->getBrokers();
+	AbsConfig::StringVector brokers = _spConfig->getBrokers();
 	EXPECT_THAT(brokers, ::testing::ContainerEq(expect));
 }
 
@@ -78,7 +75,7 @@ TEST_F(test_jsonconfig, consumer_brokers_as_string)
 
 TEST_F(test_jsonconfig, consumer_broker_options)
 {
-	Config::KeyValue options = _spConfig->getClientOptions();
+	AbsConfig::KeyValue options = _spConfig->getClientOptions();
 	ASSERT_EQ(std::string("sasl_ssl"), options["security.mechanism"]);
 	ASSERT_EQ(std::string("testuser"), options["sasl_username"]);
 	ASSERT_EQ(std::string("testpass"), options["sasl_password"]);
@@ -106,6 +103,22 @@ TEST_F(test_jsonconfig, consumer_callback_url)
 	);
 }
 
+TEST_F(test_jsonconfig, consumer_callback_httpverb)
+{
+	ASSERT_EQ(
+		std::string("POST"), 
+		_spConfig->getHttpVerb()
+	);
+}
+
+TEST_F(test_jsonconfig, consumer_callback_content_type)
+{
+	ASSERT_EQ(
+		std::string("application/JSON"), 
+		_spConfig->getContentType()
+	);
+}
+
 TEST_F(test_jsonconfig, consumer_callback_expect_response_code)
 {
 	ASSERT_EQ(200, _spConfig->getExpectResponseCode());
@@ -113,7 +126,7 @@ TEST_F(test_jsonconfig, consumer_callback_expect_response_code)
 
 TEST_F(test_jsonconfig, consumer_callback_headers)
 {
-	Config::KeyValue headers = _spConfig->getRequestHeaders();
+	AbsConfig::KeyValue headers = _spConfig->getRequestHeaders();
 	ASSERT_EQ(std::string("humbug-1"), headers["X-Request-1"]);
 	ASSERT_EQ(std::string("humbug-2"), headers["X-Request-2"]);
 }

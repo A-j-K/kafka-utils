@@ -2,7 +2,7 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "utils/pipe.hpp"
+#include "pipe.hpp"
 
 class mock_pipe : public Pipe 
 {

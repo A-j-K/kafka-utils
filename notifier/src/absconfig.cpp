@@ -1,12 +1,12 @@
 
 #include <sstream>
-#include "config.hpp"
+#include "absconfig.hpp"
 
-Config::Config() : _verified(false) 
+AbsConfig::AbsConfig() : _verified(false) 
 {}
 
 std::string
-Config::getBrokersAsString(void) 
+AbsConfig::getBrokersAsString(void) 
 { 
 	bool skipfirst = true;
 	std::string rval;

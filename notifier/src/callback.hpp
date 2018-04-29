@@ -4,8 +4,9 @@
 #include <memory>
 #include <curl/curl.h>
 
-#include "utils/pipe.hpp"
-#include "config/config.hpp"
+#include "pipe.hpp"
+#include "curler.hpp"
+#include "absconfig.hpp"
 
 class Callback
 {
@@ -14,19 +15,31 @@ public:
 	typedef std::shared_ptr<std::thread> ThreadShPtr;
 
 protected:
-	CURL *_pCurl;
-	Config::ShPtr _pConfig;
+	AbsConfig::ShPtr _pConfig;
 	Pipe::ShPtr _pInputPipe;
-	ThreadShPtr _thread;
+	ThreadShPtr _pThread;
+	Curler::ShPtr _pCurler;
+
+	virtual void run(); // Called statically from thread runner.
+
+        virtual CurlerRval::ShPtr send(PipeEntry::ShPtr&);
+
+	Callback(); // ctor protected to prevent usage.
 
 public:
-	Callback();
-	~Callback();
-	Callback(Config::ShPtr &);
+	virtual ~Callback();
+	Callback(AbsConfig::ShPtr &); // ctor to use.
+	
+	Callback(   // ctor for DI
+        	AbsConfig::ShPtr&,
+	        Curler::ShPtr&
+	);
 
-	Pipe::ShPtr getInputPipe(void) { return _pInputPipe; }
 
-	void run(Callback *self);
-	static void static_run(Callback *self);
+	static void static_run(Callback*);
+
+	ThreadShPtr getThread()    { return _pThread;    }
+	Curler::ShPtr getCurler()  { return _pCurler;    }
+	Pipe::ShPtr getInputPipe() { return _pInputPipe; }
 };
 

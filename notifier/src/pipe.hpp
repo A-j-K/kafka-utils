@@ -11,13 +11,20 @@ class PipeEntry
 {
 public:
 	typedef std::shared_ptr<PipeEntry> ShPtr;
+	enum msgType {
+		eTHREAD_TERM,
+		eKAFKA_MSG
+	};
 protected:
 	RdKafka::Message *_pMessage;
+	msgType _type;
 public:
 	PipeEntry();
 	PipeEntry(RdKafka::Message *);
 	virtual ~PipeEntry();
 	const RdKafka::Message * getMessagePtr(void);
+	PipeEntry& setType(msgType type) { _type = type; }
+	msgType getType() { return _type; }
 };
 
 

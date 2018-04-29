@@ -1,14 +1,14 @@
 #pragma once
 
-#include "config.hpp" 
+#include "absconfig.hpp" 
 
 class ConfigFactory
 {
 public:
-	static Config::ShPtr
+	static AbsConfig::ShPtr
 	getConfigByFile(const std::string &filename); 
 
-	static Config::ShPtr
+	static AbsConfig::ShPtr
 	getConfigByJsonString(const std::string &json); 
 };
 

@@ -3,16 +3,16 @@
 #include "jsonconfig.hpp"
 
 
-Config::ShPtr
+AbsConfig::ShPtr
 ConfigFactory::getConfigByFile(const std::string &filename)
 {
-	return Config::ShPtr(new JsonConfigFromFile(filename));
+	return AbsConfig::ShPtr(new JsonConfigFromFile(filename));
 }
 
-Config::ShPtr
+AbsConfig::ShPtr
 ConfigFactory::getConfigByJsonString(const std::string &json)
 {
-	return Config::ShPtr(new JsonConfigFromString(json));
+	return AbsConfig::ShPtr(new JsonConfigFromString(json));
 }
 
 
