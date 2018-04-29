@@ -34,11 +34,10 @@ RUN	apk add --no-cache \
 	&& cmake .. && make && make install \
 	&& cd /tmp && rm -rf build \
 	&& cd /workspace && mkdir build && cd build \
-	&& cmake .. && make && make install \
-	&& cp test/notify_tests /usr/bin/notify_tests \
+	&& cmake -DBUILD_TESTS=ON .. && make && test/notifier_tests && make install \
 	&& cd / && rm -rf workspace \
 	&& apk del $DEPS_DEV_TOOLS $DEPS_BUILD_TOOLS \
 	&& rm -rf /var/cache/apk/*
 
-#CMD ["/usr/bin/notifier"]
+CMD ["/usr/bin/notifier"]
 #CMD ["/workspace/build/test/notify_tests"]

@@ -12,17 +12,17 @@ INCLUDE_DIRECTORIES(
 	"${PROJECT_SOURCE_DIR}/src"
 )
 
-FILE(GLOB notify_test_SRCS
+FILE(GLOB notifier_test_SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/test-*.cpp"
 )
 
 #MESSAGE(STATUS "Sources: ${notify_test_SRCS}")
 
-ADD_EXECUTABLE(notify_tests
-	${notify_test_SRCS}
+ADD_EXECUTABLE(notifier_tests
+	${notifier_test_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(notify_tests
+TARGET_LINK_LIBRARIES(notifier_tests
 	notifier_lib
 	pthread
 	${GTEST_LIBRARIES}
@@ -32,11 +32,11 @@ TARGET_LINK_LIBRARIES(notify_tests
 
 ADD_TEST(
 	NAME "test-jsonconfig"
-	COMMAND $<TARGET_FILE:notify_tests>
+	COMMAND $<TARGET_FILE:notifier_tests>
 )
 ADD_TEST(
 	NAME "test-pipe"
-	COMMAND $<TARGET_FILE:notify_tests>
+	COMMAND $<TARGET_FILE:notifier_tests>
 )
 
 
