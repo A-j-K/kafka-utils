@@ -27,16 +27,15 @@ callback_body_writer(char* pbuffer, size_t size, size_t nitems, void* puserdata)
 #endif                     
 
 int  Curler::_counter = 0;
-bool Curler::_init = false;
 
 Curler::Curler()
 {
 	_pCurl = curl_easy_init();
 	Curler::_counter++;
-	if(!Curler::_init) {
+	if(Curler::_counter == 0) {
 		curl_global_init(CURL_GLOBAL_ALL);
-		Curler::_init = true;
 	}
+	Curler::_counter++;
 }
 
 Curler::~Curler()
@@ -48,7 +47,6 @@ Curler::~Curler()
 	Curler::_counter--;
 	if(Curler::_counter < 1) {
 		curl_global_cleanup();
-		Curler::_init = false;
 	}
 }
 

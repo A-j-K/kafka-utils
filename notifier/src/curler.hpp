@@ -46,7 +46,6 @@ class Curler
 public:
 	typedef std::shared_ptr<Curler> ShPtr;
 
-	static bool	_init;
 	static int      _counter;
 
 	CURL		*_pCurl;
