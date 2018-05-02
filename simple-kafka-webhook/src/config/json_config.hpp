@@ -1,9 +1,9 @@
 #pragma once
 
 #include <jansson.h>
-#include "absconfig.hpp" 
+#include "abstract_config.hpp" 
 
-class JsonConfig : public AbsConfig
+class JsonConfig : public AbstractConfig
 {
 public:
 	int loadFromFile(const std::string &filename); 

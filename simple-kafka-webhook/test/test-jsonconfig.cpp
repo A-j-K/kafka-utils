@@ -2,7 +2,7 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "configfactory.hpp"
+#include "config/config_factory.hpp"
 
 static const char 
 *ptest_str = R"END(
@@ -17,7 +17,7 @@ static const char
 			"partition": 10
 		},
 		"options": [
-			{ "name": "group.id",           "value": "myconsumergroup" },
+			{ "name": "group.id",           "value": "mycustomergroup" },
 			{ "name": "security.mechanism", "value": "sasl_ssl" },
 			{ "name": "sasl_username",      "value": "testuser" },
 			{ "name": "sasl_password",      "value": "testpass" }
@@ -39,7 +39,7 @@ static const char
 class test_jsonconfig : public ::testing::Test
 {
 public:
-	AbsConfig::ShPtr _spConfig;
+	AbstractConfig::ShPtr _spConfig;
 	virtual void SetUp() {
 		std::string s(ptest_str);
 		_spConfig = ConfigFactory::getConfigByJsonString(s);

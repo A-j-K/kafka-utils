@@ -8,8 +8,7 @@
 #include <curl/curl.h>
 
 #include "utils.hpp"
-#include "pipe.hpp"
-#include "absconfig.hpp"
+#include "config/abstract_config.hpp"
 
 struct CurlHeaderHolder
 {
@@ -48,21 +47,20 @@ class Curler
 public:
 	typedef std::shared_ptr<Curler> ShPtr;
 
-	static int      _counter;
-	std::mutex	_counter_mtx;
-
 	CURL		*_pCurl;
 
 protected:
-	AbsConfig::ShPtr	_pConfig;
+	AbstractConfig::ShPtr	_pConfig;
 
 public:
 	Curler();
 	virtual ~Curler();
-	Curler(AbsConfig::ShPtr pConfig);
+	Curler(AbstractConfig::ShPtr pConfig);
+
+	static void startup(void);
+	static void shutdown(void);
 
 	virtual std::string xlateCode2str(CURLcode code);
-
 	virtual CurlerRval::ShPtr send(char *p, int len, Utils::StringVector& pHeaders);
 	
 };

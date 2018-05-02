@@ -41,13 +41,14 @@ protected:
 	std::mutex _mutex;
 	std::queue<PipeEntry::ShPtr> _queue;
 public:
-	Pipe() : _maxCount(1) {}
-	Pipe(int max) : _maxCount(max) {}
-	bool pushBack(PipeEntry::ShPtr entry, bool try_lock = Pipe::BLOCKING);
-	PipeEntry::ShPtr popFront(bool try_lock, bool *result);
-	bool isEmpty(bool try_lock, bool *result);
-	bool isFull(bool try_lock, bool *result);
-	Pipe& setMaxCount(int max, bool try_lock, bool *result);
-	size_t getSize(bool try_lock, bool *result);
+	Pipe();
+	Pipe(int max);
+	virtual ~Pipe();
+	virtual bool pushBack(PipeEntry::ShPtr entry, bool try_lock = Pipe::BLOCKING);
+	virtual PipeEntry::ShPtr popFront(bool try_lock, bool *result);
+	virtual bool isEmpty(bool try_lock, bool *result);
+	//virtual bool isFull(bool try_lock, bool *result);
+	virtual Pipe& setMaxCount(int max, bool try_lock, bool *result);
+	virtual size_t getSize(bool try_lock, bool *result);
 };
 

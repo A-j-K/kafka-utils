@@ -22,6 +22,17 @@ PipeEntry::getMessagePtr(void)
 	return _pMessage;
 }
 
+Pipe::Pipe() : 
+	_maxCount(1) 
+{}
+        
+Pipe::Pipe(int max) : 
+	_maxCount(max) 
+{}
+
+Pipe::~Pipe()
+{}
+
 bool 
 Pipe::pushBack(PipeEntry::ShPtr entry, bool try_lock)
 {
@@ -49,23 +60,33 @@ Pipe::pushBack(PipeEntry::ShPtr entry, bool try_lock)
 PipeEntry::ShPtr 
 Pipe::popFront(bool try_lock, bool *result)
 {
-	PipeEntry::ShPtr sp;
+	PipeEntry::ShPtr sp(0);
 	if(try_lock) {
 		if(_mutex.try_lock()) {
-			sp = _queue.front();
-			_queue.pop();
+			if(_queue.size() > 0) {
+				sp = _queue.front();
+				_queue.pop();
+				if(result) *result = true;
+			}
+			else {
+				if(result) *result = false;
+			}
 			_mutex.unlock();
-			if(result) *result = true;
 			return sp;
 		}
 		if(result) *result = false;
 		return sp;
 	}
 	_mutex.lock();
-	sp = _queue.front();
-	_queue.pop();
+	if(_queue.size() > 0) {
+		sp = _queue.front();
+		_queue.pop();
+		if(result) *result = true;
+	}
+	else {
+		if(result) *result = false;
+	}
 	_mutex.unlock();
-	if(result) *result = true;
 	return sp;
 }
 

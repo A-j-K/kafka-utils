@@ -1,0 +1,36 @@
+FROM alpine:3.7
+
+ENV DEPS_DEV_TOOLS \
+	bash \
+	curl \
+	tar \
+	vim \
+	openssh \
+	unzip \
+	file \
+	git
+
+ENV DEPS_BUILD_TOOLS \
+	build-base \
+	cmake \
+	gtest \
+	curl-dev \
+	jansson-dev \
+	librdkafka-dev
+
+ENV DEPS \
+	libcurl \
+	ca-certificates \
+	jansson \
+	librdkafka
+
+RUN	apk add --no-cache \
+		$DEPS $DEPS_DEV_TOOLS $DEPS_BUILD_TOOLS \
+	&& mkdir -p /tmp/build && cd /tmp/build \ 
+	&& curl -sSL https://github.com/google/googletest/archive/release-1.8.0.zip > gtest.zip \
+	&& unzip -q gtest.zip && rm -f gtest.zip \
+	&& cd googletest-release-1.8.0 && mkdir build && cd build \
+	&& cmake .. && make && make install \
+	&& cd /tmp && rm -rf build
+CMD ["/usr/bin/notifier"]
+

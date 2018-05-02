@@ -20,7 +20,8 @@ protected:
 	ThreadShPtr _pThread;
 	Curler::ShPtr _pCurler;
 
-	virtual void run(); // Called statically from thread runner.
+	virtual bool run(bool); // Called statically from thread runner.
+	virtual bool run_once(bool); // Called statically from thread runner.
 
         virtual CurlerRval::ShPtr send(PipeEntry::ShPtr&);
 
@@ -28,15 +29,17 @@ protected:
 
 public:
 	virtual ~Callback();
-	Callback(AbsConfig::ShPtr &); // ctor to use.
+	Callback(AbsConfig::ShPtr &, bool thd = true); // ctor to use.
 	
 	Callback(   // ctor for DI
         	AbsConfig::ShPtr&,
-	        Curler::ShPtr&
+	        Curler::ShPtr&,
+		Pipe::ShPtr&
 	);
 
 
 	static void static_run(Callback*);
+	static bool static_run_once(Callback*, bool blocking);
 
 	ThreadShPtr getThread()    { return _pThread;    }
 	Curler::ShPtr getCurler()  { return _pCurler;    }

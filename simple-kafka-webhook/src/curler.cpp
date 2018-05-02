@@ -1,41 +1,12 @@
 
 #include <sstream>
 #include "curler.hpp"
-
-
-#ifdef __cplusplus
-extern "C" { // C callbacks for libcurl
-#endif
-static size_t
-callback_header_writer(char* pbuffer, size_t size, size_t nitems, void* puserdata)
-{
-        size_t actualsize = size * nitems; 
-        CurlHeaderHolder *h = (CurlHeaderHolder*)puserdata;
-        h->addHeader(pbuffer, actualsize);
-        return actualsize;
-}
-static size_t
-callback_body_writer(char* pbuffer, size_t size, size_t nitems, void* puserdata)
-{                           
-        size_t actualsize = size * nitems; 
-        CurlBodyHolder *b = (CurlBodyHolder*)puserdata;
-        b->addBody(pbuffer, actualsize);
-        return actualsize;  
-}                           
-#ifdef __cplusplus          
-}                           
-#endif                     
-
-int  Curler::_counter = 0;
+#include "curlerc.hpp"
 
 Curler::Curler()
 {
+	curl_global_init(CURL_GLOBAL_ALL);
 	_pCurl = curl_easy_init();
-	std::lock_guard<std::mutex> lock(_counter_mtx);
-	if(Curler::_counter == 0) {
-		curl_global_init(CURL_GLOBAL_ALL);
-	}
-	Curler::_counter++;
 }
 
 Curler::~Curler()
@@ -44,18 +15,26 @@ Curler::~Curler()
 		curl_easy_cleanup(_pCurl);
 		_pCurl = NULL;
 	}
-	std::lock_guard<std::mutex> lock(_counter_mtx);
-	Curler::_counter--;
-	if(Curler::_counter < 1) {
-		curl_global_cleanup();
-	}
+	curl_global_cleanup();
 }
 
-Curler::Curler(AbsConfig::ShPtr pConfig) :
+Curler::Curler(AbstractConfig::ShPtr pConfig) :
 	_pConfig(pConfig)
 {
 }
 	
+void
+Curler::startup(void)
+{
+	curl_global_init(CURL_GLOBAL_ALL);
+}
+
+void
+Curler::shutdown(void)
+{
+	curl_global_cleanup();
+}
+
 std::string
 Curler::xlateCode2str(CURLcode code) 
 {

@@ -1,12 +1,14 @@
 
 
 SET(libnotify_SRCS
+	pipe.cpp
+	kafka.cpp
+	kafkapp.cpp
 	curler.cpp
 	callback.cpp
-	pipe.cpp
 	absconfig.cpp
-	configfactory.cpp
 	jsonconfig.cpp
+	configfactory.cpp
 )
 
 ADD_LIBRARY(notifier_lib
@@ -15,6 +17,7 @@ ADD_LIBRARY(notifier_lib
 
 TARGET_LINK_LIBRARIES(notifier_lib
 	curl
+	rdkafka
 	pthread
 	jansson
 )

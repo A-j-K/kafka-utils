@@ -1,17 +1,17 @@
 
 #include <sstream>
-#include "absconfig.hpp"
+#include "abstract_config.hpp"
 
-AbsConfig::AbsConfig() : _verified(false) 
+AbstractConfig::AbstractConfig() : _verified(false) 
 {}
 
 std::string
-AbsConfig::getBrokersAsString(void) 
+AbstractConfig::getBrokersAsString(void) const
 { 
 	bool skipfirst = true;
 	std::string rval;
 	std::stringstream oss;
-	Utils::StringVector::iterator itor = _brokers.begin();
+	Utils::StringVector::const_iterator itor = _brokers.begin();
 	while(itor != _brokers.end()) {
 		if(!skipfirst) {
 			oss << ",";
