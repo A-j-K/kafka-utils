@@ -1,19 +1,17 @@
 
-PROJECT("simple-kafka-webhook")
-
-SET(simple_kafka_webhook_SRCS
+SET(main_SRCS
         main.cpp
 )
 
-ADD_EXECUTABLE("simple-kafka-webhook"
-        ${simple_kafka_webhook_SRCS}
+ADD_EXECUTABLE("${PROJECT_NAME}"
+        ${main_SRCS}
 )
 
-TARGET_LINK_LIBRARIES("simple-kafka-webhook"
-	simple_kafka_webhook_lib
+TARGET_LINK_LIBRARIES("${PROJECT_NAME}"
+	webhook_lib
 )
 
-INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/simple-kafka-webhook
+INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
 	DESTINATION /usr/bin
 )
 	

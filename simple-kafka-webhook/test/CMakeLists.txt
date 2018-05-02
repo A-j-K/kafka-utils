@@ -12,17 +12,18 @@ INCLUDE_DIRECTORIES(
 	"${PROJECT_SOURCE_DIR}/src"
 )
 
-SET(lib_simple_kafka_webhook_test_SRCS
+SET(test_SRCS
 	test-jsonconfig.cpp
 	test-kafka-configure.cpp
+	test-kafka-event-cb.cpp
 )
 
-ADD_EXECUTABLE(lib-simple-kafka-webhook-tests
-	${lib_simple_kafka_webhook_test_SRCS}
+ADD_EXECUTABLE(webhook-tests
+	${test_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(lib-simple-kafka-webhook-tests
-	simple_kafka_webhook_lib
+TARGET_LINK_LIBRARIES(webhook-tests
+	webhook_lib
 	pthread
 	${GTEST_LIBRARIES}
 	${GTEST_MAIN_LIBRARIES}
@@ -31,6 +32,16 @@ TARGET_LINK_LIBRARIES(lib-simple-kafka-webhook-tests
 
 ADD_TEST(
 	NAME "test-jsonconfig"
-	COMMAND $<TARGET_FILE:lib-simple-kafka-webhook-tests>
+	COMMAND $<TARGET_FILE:webhook-tests>
+)
+
+ADD_TEST(
+	NAME "test-kafka-configure"
+	COMMAND $<TARGET_FILE:webhook-tests>
+)
+
+ADD_TEST(
+	NAME: "test-kafka-event-cb"
+	COMMAND $<TARGET_FILE:webhook-tests>
 )
 

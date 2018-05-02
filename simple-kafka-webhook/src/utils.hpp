@@ -1,9 +1,11 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <sstream>
+#include <librdkafka/rdkafkacpp.h>
 
 #ifdef BUILD_TESTS
 #define PROTECTED public
@@ -16,6 +18,9 @@ class Utils
 public:
 	typedef std::vector<std::string> StringVector;
 	typedef std::map<std::string, std::string> KeyValue;
+
+	typedef std::shared_ptr<RdKafka::Conf> KafkaConfShPtr;
+	typedef std::shared_ptr<RdKafka::KafkaConsumer> KafkaConsumerShPtr;
 };
 
 

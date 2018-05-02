@@ -1,6 +1,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
-PROJECT("simple-kafka-webhook")
+PROJECT("generic-kafka-webhook")
 SET(CMAKE_MODULE_PATH
         "${PROJECT_SOURCE_DIR}/cmake"
         "${CMAKE_MODULE_PATH}"

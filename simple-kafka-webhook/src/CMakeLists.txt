@@ -1,7 +1,8 @@
 
 
-SET(lib_simple_kafka_webhook_SRCS
+SET(lib_SRCS
 	kafka.cpp
+	kafka_event_cb.cpp
 	curler.cpp
 	curlerc.cpp
 	config/abstract_config.cpp
@@ -9,13 +10,14 @@ SET(lib_simple_kafka_webhook_SRCS
 	config/config_factory.cpp
 )
 
-ADD_LIBRARY(simple_kafka_webhook_lib
-	${lib_simple_kafka_webhook_SRCS}
+ADD_LIBRARY(webhook_lib
+	${lib_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(simple_kafka_webhook_lib
+TARGET_LINK_LIBRARIES(webhook_lib
 	curl
 	rdkafka
+	rdkafka++
 	pthread
 	jansson
 )

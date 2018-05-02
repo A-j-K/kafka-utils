@@ -8,20 +8,46 @@
 #include "kafka.hpp"
 
 Kafka::Kafka()
-{} 
+{}
+
+Kafka::Kafka(AbstractConfig *pConfig) :
+	_pConfig(pConfig)
+{}
+
+Kafka::Kafka(RdKafka::KafkaConsumer *pConsumer) :
+	_pKafkaConsumer(pConsumer)
+{}
 
 Kafka::~Kafka()
 {}
 
+Kafka&
+Kafka::setConfig(AbstractConfig *inpConfig)
+{
+	_pConfig = inpConfig;
+	return *this;
+}
+
+RdKafka::KafkaConsumer*
+Kafka::prepare(AbstractConfig *pConfig, std::string &outErrstr)
+{
+	RdKafka::Conf *_pKafkaConf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+	configure(pConfig, _pKafkaConf);
+	return (_pKafkaConsumer = RdKafka::KafkaConsumer::create(_pKafkaConf, outErrstr));
+}
+
 void
-Kafka::configure(const AbstractConfig *pConfig, 
-	RdKafka::Conf *pConf,
-	RdKafka::Conf *pTopic
+Kafka::configure(const AbstractConfig *inpConfig, 
+	RdKafka::Conf *inpConf,
+	RdKafka::Conf *inpTopic
 )
 {
+	bool deleteTopic = false,
+	     addDefaultTopicConf = false;
 	std::string errstr;
 	RdKafka::Conf::ConfResult result;
-	Utils::KeyValue options = pConfig->getClientOptions();
+	RdKafka::Conf *pTopic = inpTopic ? inpTopic : 0;
+	Utils::KeyValue options = inpConfig->getClientOptions();
 	Utils::KeyValue::const_iterator itor_options = options.begin();
 	while(itor_options != options.end()) {
 		size_t topic_pos;
@@ -30,31 +56,41 @@ Kafka::configure(const AbstractConfig *pConfig,
 		topic_pos = name.find("topic.", 0);
 		if(topic_pos != std::string::npos && topic_pos == 0) {
 			std::string newname = name.substr(sizeof("topic.")-1);
+			if(!pTopic) {
+				pTopic = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
+				deleteTopic = true;
+			}
 			result = pTopic->set(newname, value, errstr);
+			addDefaultTopicConf = true;
 			if(result != RdKafka::Conf::ConfResult::CONF_OK) {
 				throw new std::invalid_argument(
 					stringbuilder()
 					<< "Configure failure at line "
-					<< __LINE__ << errstr
+					<< __LINE__ << " " << errstr
 				);
 			}
 		}
 		else {
-			result = pConf->set(name, value, errstr);
+			result = inpConf->set(name, value, errstr);
 			if(result != RdKafka::Conf::ConfResult::CONF_OK) {
 				throw new std::invalid_argument(
 					stringbuilder()
 					<< "Configure failure at line "
-					<< __LINE__ << errstr
+					<< __LINE__ << " " << errstr
 				);
 			}
 		}
 		if(name == "group.id") {
-			pConf->set("offset.store.method", "broker", errstr);
+			inpConf->set("offset.store.method", "broker", errstr);
 		}
 		itor_options++;
 	}
 
-	pConf->set(std::string("default_topic_conf"), pTopic, errstr);
+	if(addDefaultTopicConf) {
+		inpConf->set(std::string("default_topic_conf"), pTopic, errstr);
+	}
+	if(deleteTopic) {
+		delete pTopic;
+	}
 }
 
