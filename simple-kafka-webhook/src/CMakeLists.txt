@@ -3,6 +3,7 @@
 SET(lib_SRCS
 	kafka.cpp
 	kafka_event_cb.cpp
+	kafka_consume_cb.cpp
 	curler.cpp
 	curlerc.cpp
 	config/abstract_config.cpp
