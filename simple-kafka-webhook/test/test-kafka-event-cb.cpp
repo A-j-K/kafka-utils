@@ -52,6 +52,8 @@ TEST_F(test_kafka_event_cb, test_EVENT_ERROR_and_ERR__END)
 	.WillOnce(Return(RdKafka::Event::EVENT_ERROR));
 	EXPECT_CALL(*_pEvent, err())
 	.WillRepeatedly(Return(RdKafka::ERR__END));
+	EXPECT_CALL(*_pEvent, str())
+	.WillOnce(Return(std::string("event error occured")));
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }
