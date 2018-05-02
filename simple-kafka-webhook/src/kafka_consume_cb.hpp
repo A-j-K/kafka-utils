@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include "utils.hpp"
+#include "curler.hpp"
 
 class KafkaConsumeCallback : public RdKafka::ConsumeCb
 {
@@ -10,8 +11,6 @@ protected:
 
 	std::ostream	*_poutput;
 
-	void
-	send(RdKafka::Message*, Curler*);
 
 public:
 	
@@ -21,7 +20,10 @@ public:
 	KafkaConsumeCallback(std::ostream *pstream) : _poutput(&std::cout) {}
 
 	virtual void 
-	consume_cb(RdKafka::Message*, void*); 
+	consume_cb(RdKafka::Message&, void*); 
+
+	virtual CurlerRval::ShPtr
+	send(RdKafka::Message*, Curler*);
 
 	virtual KafkaConsumeCallback&
 	setOutputStream(std::ostream *pstream); 

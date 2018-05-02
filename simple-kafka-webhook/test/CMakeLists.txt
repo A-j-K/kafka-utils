@@ -16,6 +16,7 @@ SET(test_SRCS
 	test-jsonconfig.cpp
 	test-kafka-configure.cpp
 	test-kafka-event-cb.cpp
+	test-kafka-consume-cb.cpp
 )
 
 ADD_EXECUTABLE(webhook-tests
@@ -42,6 +43,11 @@ ADD_TEST(
 
 ADD_TEST(
 	NAME: "test-kafka-event-cb"
+	COMMAND $<TARGET_FILE:webhook-tests>
+)
+
+ADD_TEST(
+	NAME: "test-kafka-consume-cb"
 	COMMAND $<TARGET_FILE:webhook-tests>
 )
 
