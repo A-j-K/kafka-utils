@@ -10,9 +10,6 @@
 #include "utils.hpp"
 #include "kafka_event_cb.hpp"
 
-//#include "mockrdkafkacpp.hpp"
-//#include "mockabstractconfig.hpp"
-
 #include "mocks/rdkafkacpp/MockRdKafkaEvent.h"
 #include "mocks/rdkafkacpp/MockRdKafkaEventCb.h"
 

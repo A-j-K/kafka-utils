@@ -9,9 +9,7 @@
 #include "utils.hpp"
 #include "kafka.hpp"
 
-//#include "mockrdkafkacpp.hpp"
-#include "mockabstractconfig.hpp"
-
+#include "mocks/MockAbstractConfig.hpp"
 #include "mocks/rdkafkacpp/MockRdKafkaConf.h"
 
 using ::testing::_;
