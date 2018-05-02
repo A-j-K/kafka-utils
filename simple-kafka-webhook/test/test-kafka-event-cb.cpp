@@ -84,9 +84,11 @@ TEST_F(test_kafka_event_cb, test_EVENT_ERROR_and_ERR__ALL_BROKERS_DOWN)
 TEST_F(test_kafka_event_cb, test_EVENT_STATS)
 {
 	RdKafka::ErrorCode errCode;
-	std::string expect("STATS:");
+	std::string expect("STATS: My stats");
 	EXPECT_CALL(*_pEvent, type())
 	.WillOnce(Return(RdKafka::Event::EVENT_STATS));
+	EXPECT_CALL(*_pEvent, str())
+	.WillOnce(Return(std::string("My stats")));
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }
