@@ -59,21 +59,21 @@ TEST_F(test_kafka_consume_cb, test_send_no_errors)
 	actual_curler_rval->_result = CURLE_OK;
 
 	EXPECT_CALL(*_pTopic, name())
-	.WillOnce(Return(actual_topic));
+		.WillOnce(Return(actual_topic));
 	EXPECT_CALL(*_pMessage, key())
-	.WillOnce(Return((const std::string*)&actual_key));
+		.WillOnce(Return((const std::string*)&actual_key));
 	EXPECT_CALL(*_pMessage, topic())
-	.WillOnce(Return(_pTopic));
+		.WillOnce(Return(_pTopic));
 	EXPECT_CALL(*_pMessage, partition())
-	.WillOnce(Return(5));
+		.WillOnce(Return(5));
 	EXPECT_CALL(*_pMessage, offset())
-	.WillOnce(Return(2000));
+		.WillOnce(Return(2000));
 	EXPECT_CALL(*_pMessage, payload())
-	.WillOnce(Return((char*)payload));
+		.WillOnce(Return((char*)payload));
 	EXPECT_CALL(*_pMessage, len())
-	.WillOnce(Return(length));
+		.WillOnce(Return(length));
 	EXPECT_CALL(*_pCurler, send(_,_,_))
-	.WillOnce(Return(actual_curler_rval));
+		.WillOnce(Return(actual_curler_rval));
 
 	_pKafkaConsumeCallback->send(_pMessage, _pCurler);
 }
@@ -85,24 +85,26 @@ TEST_F(test_kafka_consume_cb, test_send_bad_curle_ok_causes_exception)
 	std::string actual_key("TestKey");
 	const std::string actual_topic("TestTopic");
 	CurlerRval::ShPtr actual_curler_rval(new CurlerRval);
+
+	// Anything other than CURLE_OK...
 	actual_curler_rval->_result = CURLE_COULDNT_CONNECT;
 
 	EXPECT_CALL(*_pTopic, name())
-	.WillOnce(Return(actual_topic));
+		.WillOnce(Return(actual_topic));
 	EXPECT_CALL(*_pMessage, key())
-	.WillOnce(Return((const std::string*)&actual_key));
+		.WillOnce(Return((const std::string*)&actual_key));
 	EXPECT_CALL(*_pMessage, topic())
-	.WillOnce(Return(_pTopic));
+		.WillOnce(Return(_pTopic));
 	EXPECT_CALL(*_pMessage, partition())
-	.WillOnce(Return(5));
+		.WillOnce(Return(5));
 	EXPECT_CALL(*_pMessage, offset())
-	.WillOnce(Return(2000));
+		.WillOnce(Return(2000));
 	EXPECT_CALL(*_pMessage, payload())
-	.WillOnce(Return((char*)payload));
+		.WillOnce(Return((char*)payload));
 	EXPECT_CALL(*_pMessage, len())
-	.WillOnce(Return(length));
+		.WillOnce(Return(length));
 	EXPECT_CALL(*_pCurler, send(_,_,_))
-	.WillOnce(Return(actual_curler_rval));
+		.WillOnce(Return(actual_curler_rval));
 
 	try {
 		_pKafkaConsumeCallback->send(_pMessage, _pCurler);

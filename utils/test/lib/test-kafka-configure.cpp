@@ -46,12 +46,11 @@ TEST_F(test_kafka_configure, no_options_supplied)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(0);
+		.Times(0);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -65,18 +64,16 @@ TEST_F(test_kafka_configure, one_option_supplied)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("aunty"), 
 		Matcher<const std::string&>("alice"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(0);
+		.Times(0);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -91,24 +88,21 @@ TEST_F(test_kafka_configure, two_option_supplied)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("aunty"), 
 		Matcher<const std::string&>("alice"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("uncle"), 
 		Matcher<const std::string&>("david"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(0);
+		.Times(0);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -122,18 +116,16 @@ TEST_F(test_kafka_configure, one_topic_option_supplied)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pTopic, set(
 		Matcher<const std::string&>("father"), 
 		Matcher<const std::string&>("ted"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(1);
+		.Times(1);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -154,25 +146,22 @@ TEST_F(test_kafka_configure, one_of_each_option_supplied)
 		Matcher<const std::string&>("aunty"), 
 		Matcher<const std::string&>("alice"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("uncle"), 
 		Matcher<const std::string&>("david"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pTopic, set(
 		Matcher<const std::string&>("father"), // expect "topic." stripped
 		Matcher<const std::string&>("ted"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(1);
+		.Times(1);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -188,24 +177,21 @@ TEST_F(test_kafka_configure, anon_test_options_supplied)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(2);
-
+		.Times(2);
 	EXPECT_CALL(*_pTopic, set(
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(1);
+		.Times(1);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -227,31 +213,27 @@ TEST_F(test_kafka_configure, group_id_test_options_supplied)
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(2); // alice and david
-
+		.Times(2); // alice and david
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("group.id"), 
 		Matcher<const std::string&>("mytestgroupid"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("offset.store.method"), 
 		Matcher<const std::string&>("broker"), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pTopic, set(
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(1);
-
+		.Times(1);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
-	.Times(1);
+		.Times(1);
 
 	_pKafka->configure(&Config, _pConf, _pTopic);
 }
@@ -272,18 +254,16 @@ TEST_F(test_kafka_configure, anon_test_options_supplied_default_conf)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(2);
-
+		.Times(2);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_), 
 		StrEq("")))
-	.Times(1);
+		.Times(1);
 
 	_pKafka->configure(&Config, _pConf /* no _pTopic this time */);
 }
@@ -297,18 +277,16 @@ TEST_F(test_kafka_configure, expect_exception_invalid_args)
 
 	ON_CALL(Config, getClientOptions())
 		.WillByDefault(ReturnRef(options));
-
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
 		Matcher<const std::string&>(_), 
 		Matcher<std::string&>(_)))
-	.Times(0);
-
+		.Times(0);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_), 
 		StrEq("")))
-	.Times(0);
+		.Times(0);
 
 	try {
 		_pKafka->configure(&Config, _pConf);

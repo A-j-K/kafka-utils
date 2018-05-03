@@ -1,5 +1,5 @@
 
-PROJECT("kafka-urils-lib")
+PROJECT("test-kafka-lib")
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
@@ -10,7 +10,7 @@ FIND_PACKAGE(GMock REQUIRED)
 INCLUDE_DIRECTORIES(
 	"${GTEST_INCLUDE_DIRS}"
 	"${GMOCK_INCLUDE_DIRS}"
-	"${PROJECT_SOURCE_DIR}/src"
+	"${PROJECT_SOURCE_DIR}/lib"
 )
 
 SET(test_SRCS
@@ -20,11 +20,11 @@ SET(test_SRCS
 	test-kafka-consume-cb.cpp
 )
 
-ADD_EXECUTABLE(webhook-tests
+ADD_EXECUTABLE(${PROJECT_NAME}
 	${test_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(webhook-tests
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 	kafka_utils_lib
 	pthread
 	${GTEST_LIBRARIES}
@@ -34,21 +34,21 @@ TARGET_LINK_LIBRARIES(webhook-tests
 
 ADD_TEST(
 	NAME "test-jsonconfig"
-	COMMAND $<TARGET_FILE:webhook-tests>
+	COMMAND $<TARGET_FILE:${PROJECT_NAME}>
 )
 
 ADD_TEST(
 	NAME "test-kafka-configure"
-	COMMAND $<TARGET_FILE:webhook-tests>
+	COMMAND $<TARGET_FILE:${PROJECT_NAME}>
 )
 
 ADD_TEST(
-	NAME: "test-kafka-event-cb"
-	COMMAND $<TARGET_FILE:webhook-tests>
+	NAME "test-kafka-event-cb"
+	COMMAND $<TARGET_FILE:${PROJECT_NAME}>
 )
 
 ADD_TEST(
-	NAME: "test-kafka-consume-cb"
-	COMMAND $<TARGET_FILE:webhook-tests>
+	NAME "test-kafka-consume-cb"
+	COMMAND $<TARGET_FILE:${PROJECT_NAME}>
 )
 

@@ -34,7 +34,8 @@ RUN	apk add --no-cache \
 	&& cmake .. && make && make install \
 	&& cd /tmp && rm -rf build \
 	&& cd /workspace && mkdir build && cd build \
-	&& cmake -DBUILD_TESTS=ON .. && make && test/webhook-tests && make install \
+	&& cmake -DBUILD_TESTS=ON .. && make \
+	&& cd test && ctest && cd .. && make install \
 	&& cd / && rm -rf workspace \
 	&& apk del $DEPS_DEV_TOOLS $DEPS_BUILD_TOOLS \
 	&& rm -rf /var/cache/apk/* \
@@ -42,4 +43,4 @@ RUN	apk add --no-cache \
 	&& rm -rf /usr/local/include/gtest \
 	&& rm -f /usr/local/lib/libg* 
 
-CMD ["/usr/bin/simple-kafka-webhook"]
+CMD ["/usr/bin/generic-kafka-webhook"]

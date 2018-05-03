@@ -48,12 +48,14 @@ TEST_F(test_kafka_event_cb, test_EVENT_ERROR_and_ERR__END)
 {
 	RdKafka::ErrorCode errCode;
 	std::string expect("ERROR:");
+
 	EXPECT_CALL(*_pEvent, type())
-	.WillOnce(Return(RdKafka::Event::EVENT_ERROR));
+		.WillOnce(Return(RdKafka::Event::EVENT_ERROR));
 	EXPECT_CALL(*_pEvent, err())
-	.WillRepeatedly(Return(RdKafka::ERR__END));
+		.WillRepeatedly(Return(RdKafka::ERR__END));
 	EXPECT_CALL(*_pEvent, str())
-	.WillOnce(Return(std::string("event error occured")));
+		.WillOnce(Return(std::string("event error occured")));
+
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }
@@ -62,12 +64,14 @@ TEST_F(test_kafka_event_cb, test_EVENT_ERROR_and_ERR__ALL_BROKERS_DOWN)
 {
 	RdKafka::ErrorCode errCode;
 	std::string expect("ERROR:");
+
 	EXPECT_CALL(*_pEvent, type())
-	.WillOnce(Return(RdKafka::Event::EVENT_ERROR));
+		.WillOnce(Return(RdKafka::Event::EVENT_ERROR));
 	EXPECT_CALL(*_pEvent, err())
-	.WillRepeatedly(Return(RdKafka::ERR__ALL_BROKERS_DOWN));
+		.WillRepeatedly(Return(RdKafka::ERR__ALL_BROKERS_DOWN));
 	EXPECT_CALL(*_pEvent, str())
-	.WillRepeatedly(Return(std::string("Where did they go?")));
+		.WillRepeatedly(Return(std::string("Where did they go?")));
+
 	try {
 		_pKafkaEventCallback->event_cb(*_pEvent);
 		FAIL() << "Expected an exception";
@@ -85,10 +89,12 @@ TEST_F(test_kafka_event_cb, test_EVENT_STATS)
 {
 	RdKafka::ErrorCode errCode;
 	std::string expect("STATS: My stats");
+
 	EXPECT_CALL(*_pEvent, type())
-	.WillOnce(Return(RdKafka::Event::EVENT_STATS));
+		.WillOnce(Return(RdKafka::Event::EVENT_STATS));
 	EXPECT_CALL(*_pEvent, str())
-	.WillOnce(Return(std::string("My stats")));
+		.WillOnce(Return(std::string("My stats")));
+
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }
@@ -97,14 +103,16 @@ TEST_F(test_kafka_event_cb, test_EVENT_LOG)
 {
 	RdKafka::ErrorCode errCode;
 	std::string expect("LOG-6-ThisFac: ThisStr");
+
 	EXPECT_CALL(*_pEvent, severity())
-	.WillRepeatedly(Return(RdKafka::Event::EVENT_SEVERITY_INFO));
+		.WillRepeatedly(Return(RdKafka::Event::EVENT_SEVERITY_INFO));
 	EXPECT_CALL(*_pEvent, fac())
-	.WillRepeatedly(Return(std::string("ThisFac")));
+		.WillRepeatedly(Return(std::string("ThisFac")));
 	EXPECT_CALL(*_pEvent, str())
-	.WillRepeatedly(Return(std::string("ThisStr")));
+		.WillRepeatedly(Return(std::string("ThisStr")));
 	EXPECT_CALL(*_pEvent, type())
-	.WillOnce(Return(RdKafka::Event::EVENT_LOG));
+		.WillOnce(Return(RdKafka::Event::EVENT_LOG));
+
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }
@@ -113,14 +121,16 @@ TEST_F(test_kafka_event_cb, test_EVENT_THROTTLE)
 {
 	RdKafka::ErrorCode errCode;
 	std::string expect("THROTTLE: 1000ms BrokerName id 2000");
+
 	EXPECT_CALL(*_pEvent, throttle_time())
-	.WillRepeatedly(Return(1000));
+		.WillRepeatedly(Return(1000));
 	EXPECT_CALL(*_pEvent, broker_name())
-	.WillRepeatedly(Return(std::string("BrokerName")));
+		.WillRepeatedly(Return(std::string("BrokerName")));
 	EXPECT_CALL(*_pEvent, broker_id())
-	.WillRepeatedly(Return(2000));
+		.WillRepeatedly(Return(2000));
 	EXPECT_CALL(*_pEvent, type())
-	.WillOnce(Return(RdKafka::Event::EVENT_THROTTLE));
+		.WillOnce(Return(RdKafka::Event::EVENT_THROTTLE));
+
 	_pKafkaEventCallback->event_cb(*_pEvent);
 	ASSERT_EQ(expect, _poss->str().substr(0, expect.size()));
 }

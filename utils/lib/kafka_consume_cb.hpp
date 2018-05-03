@@ -12,13 +12,11 @@ protected:
 	void		*_puserdata;
 	std::ostream	*_poutput;
 
-
 public:
-	
 	KafkaConsumeCallback();
-	~KafkaConsumeCallback();
-
 	KafkaConsumeCallback(std::ostream *pstream) : _poutput(&std::cout) {}
+
+	virtual ~KafkaConsumeCallback();
 
 	virtual void 
 	consume_cb(RdKafka::Message&, void*); 
