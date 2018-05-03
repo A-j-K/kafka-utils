@@ -1,4 +1,7 @@
 
+INCLUDE_DIRECTORIES(
+	"${PROJECT_SOURCE_DIR}/lib"
+)
 
 SET(lib_SRCS
 	kafka.cpp
@@ -11,11 +14,11 @@ SET(lib_SRCS
 	config/config_factory.cpp
 )
 
-ADD_LIBRARY(webhook_lib
+ADD_LIBRARY(kafka_utils_lib
 	${lib_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(webhook_lib
+TARGET_LINK_LIBRARIES(kafka_utils_lib
 	curl
 	rdkafka
 	rdkafka++

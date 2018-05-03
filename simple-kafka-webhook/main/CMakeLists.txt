@@ -1,4 +1,10 @@
 
+PROJECT("generic-kafka-webhook")
+
+INCLUDE_DIRECTORIES(
+	"${PROJECT_SOURCE_DIR}/lib"
+)
+
 SET(main_SRCS
         main.cpp
 )
@@ -8,7 +14,7 @@ ADD_EXECUTABLE("${PROJECT_NAME}"
 )
 
 TARGET_LINK_LIBRARIES("${PROJECT_NAME}"
-	webhook_lib
+	kafka_utils_lib
 )
 
 INSTALL(PROGRAMS ${PROJECT_BINARY_DIR}/${PROJECT_NAME}

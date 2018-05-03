@@ -23,6 +23,11 @@ KafkaConsumeCallback::setOutputStream(std::ostream *pstream) {
 	return *this; 
 }
 
+KafkaConsumeCallback&
+KafkaConsumeCallback::setUserdata(void *p) { 
+	_puserdata = p; 
+	return *this; 
+}
 CurlerRval::ShPtr
 KafkaConsumeCallback::send(RdKafka::Message *inpMsg, Curler *inpCurler)
 {
@@ -51,13 +56,9 @@ KafkaConsumeCallback::consume_cb(RdKafka::Message &msg, void *puserdata)
 	Utils::StringVector headers;
 	
 	switch(msg.err()) {
-
-	case RdKafka::ERR_NO_ERROR:
-		send(&msg, pCurler);
-		break;
-
-
-	// end switch
+		case RdKafka::ERR_NO_ERROR:
+			send(&msg, pCurler);
+			break;
 	}
 
 

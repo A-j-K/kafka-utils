@@ -9,6 +9,7 @@ class KafkaConsumeCallback : public RdKafka::ConsumeCb
 {
 protected:
 
+	void		*_puserdata;
 	std::ostream	*_poutput;
 
 
@@ -27,6 +28,9 @@ public:
 
 	virtual KafkaConsumeCallback&
 	setOutputStream(std::ostream *pstream); 
+
+	virtual KafkaConsumeCallback&
+	setUserdata(void *); 
 };
 
 
