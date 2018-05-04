@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <stdexcept>
 
-#include "kafka.hpp"
 #include "kafka_consume_cb.hpp"
 
 #include "utils.hpp"
@@ -28,6 +27,7 @@ KafkaConsumeCallback::setUserdata(void *p) {
 	_puserdata = p; 
 	return *this; 
 }
+
 CurlerRval::ShPtr
 KafkaConsumeCallback::send(RdKafka::Message *inpMsg, Curler *inpCurler)
 {
@@ -51,6 +51,7 @@ KafkaConsumeCallback::send(RdKafka::Message *inpMsg, Curler *inpCurler)
 void 
 KafkaConsumeCallback::consume_cb(RdKafka::Message &msg, void *puserdata) 
 {
+#if 0
 	Kafka *pKafka = reinterpret_cast<Kafka*>(puserdata);
 	Curler *pCurler = pKafka->getCurler();
 	Utils::StringVector headers;
@@ -60,8 +61,7 @@ KafkaConsumeCallback::consume_cb(RdKafka::Message &msg, void *puserdata)
 			send(&msg, pCurler);
 			break;
 	}
-
-
+#endif
 }
 
 

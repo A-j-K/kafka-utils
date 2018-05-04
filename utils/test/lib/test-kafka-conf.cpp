@@ -7,7 +7,7 @@
 #include <exception>
 
 #include "utils.hpp"
-#include "kafka.hpp"
+#include "kafka_conf.hpp"
 
 #include "mocks/MockAbstractConfig.hpp"
 #include "mocks/rdkafkacpp/MockRdKafkaConf.h"
@@ -21,48 +21,57 @@ using ::testing::NiceMock;
 using ::testing::ReturnRef; 
 
 // Fixture
-class test_kafka_configure : public ::testing::Test
+class test_kafka_conf : public ::testing::Test
 {
 public:
-	Kafka *_pKafka;
-	MockRdKafkaConf *_pConf;
-	MockRdKafkaConf *_pTopic;
+	MockRdKafkaConf		*_pConf;
+	MockRdKafkaConf		*_pTopic;
+	MockAbstractConfig	*_pConfig;
 	virtual void SetUp() {
-		_pKafka = new Kafka;
 		_pConf  = new NiceMock<MockRdKafkaConf>;
 		_pTopic = new NiceMock<MockRdKafkaConf>;
+		_pConfig = new NiceMock<MockAbstractConfig>;
 	}
 	virtual void TearDown() {
-		delete _pKafka;
 		delete _pConf;
 		delete _pTopic;
+		delete _pConfig;
 	}
 };
 
-TEST_F(test_kafka_configure, no_options_supplied)
+TEST_F(test_kafka_conf, no_options_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
+	// No options, expect no calls.
+	EXPECT_CALL(*_pConf, set(
+		_, 
+		Matcher<const RdKafka::Conf*>(_pTopic), 
+		StrEq("")))
+		.Times(0);
+	EXPECT_CALL(*_pConf, set(
+		_, 
+		Matcher<const RdKafka::Conf*>(_pConf), 
+		StrEq("")))
+		.Times(0);
 	EXPECT_CALL(*_pConf, set(
 		StrEq("default_topic_conf"), 
 		Matcher<const RdKafka::Conf*>(_pTopic), 
 		StrEq("")))
 		.Times(0);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, one_option_supplied)
+TEST_F(test_kafka_conf, one_option_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("aunty"), 
@@ -75,18 +84,17 @@ TEST_F(test_kafka_configure, one_option_supplied)
 		StrEq("")))
 		.Times(0);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, two_option_supplied)
+TEST_F(test_kafka_conf, two_option_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 	options["uncle"] = "david";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>("aunty"), 
@@ -104,17 +112,16 @@ TEST_F(test_kafka_configure, two_option_supplied)
 		StrEq("")))
 		.Times(0);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, one_topic_option_supplied)
+TEST_F(test_kafka_conf, one_topic_option_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["topic.father"] = "ted";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pTopic, set(
 		Matcher<const std::string&>("father"), 
@@ -127,19 +134,18 @@ TEST_F(test_kafka_configure, one_topic_option_supplied)
 		StrEq("")))
 		.Times(1);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, one_of_each_option_supplied)
+TEST_F(test_kafka_conf, one_of_each_option_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 	options["uncle"] = "david";
 	options["topic.father"] = "ted";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 
 	EXPECT_CALL(*_pConf, set(
@@ -163,19 +169,18 @@ TEST_F(test_kafka_configure, one_of_each_option_supplied)
 		StrEq("")))
 		.Times(1);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, anon_test_options_supplied)
+TEST_F(test_kafka_conf, anon_test_options_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 	options["uncle"] = "david";
 	options["topic.father"] = "ted";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
@@ -193,20 +198,19 @@ TEST_F(test_kafka_configure, anon_test_options_supplied)
 		StrEq("")))
 		.Times(1);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, group_id_test_options_supplied)
+TEST_F(test_kafka_conf, group_id_test_options_supplied)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 	options["uncle"] = "david";
 	options["group.id"] = "mytestgroupid";
 	options["topic.father"] = "ted";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 
 	EXPECT_CALL(*_pConf, set(
@@ -235,13 +239,12 @@ TEST_F(test_kafka_configure, group_id_test_options_supplied)
 		StrEq("")))
 		.Times(1);
 
-	_pKafka->configure(&Config, _pConf, _pTopic);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, anon_test_options_supplied_default_conf)
+TEST_F(test_kafka_conf, anon_test_options_supplied_default_conf)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["aunty"] = "alice";
 	options["uncle"] = "david";
@@ -252,7 +255,7 @@ TEST_F(test_kafka_configure, anon_test_options_supplied_default_conf)
 	// real named conf key and value.
 	options["topic.auto.offset.reset"] = "smallest";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
@@ -265,17 +268,16 @@ TEST_F(test_kafka_configure, anon_test_options_supplied_default_conf)
 		StrEq("")))
 		.Times(1);
 
-	_pKafka->configure(&Config, _pConf /* no _pTopic this time */);
+	KafkaConf::get(_pConfig, _pConf, _pTopic);
 }
 
-TEST_F(test_kafka_configure, expect_exception_invalid_args)
+TEST_F(test_kafka_conf, expect_exception_invalid_args)
 {
 	Utils::KeyValue options;
-	NiceMock<MockAbstractConfig> Config;
 
 	options["topic.this"] = "should cause an exception";
 
-	ON_CALL(Config, getClientOptions())
+	ON_CALL(*_pConfig, getClientOptions())
 		.WillByDefault(ReturnRef(options));
 	EXPECT_CALL(*_pConf, set(
 		Matcher<const std::string&>(_), 
@@ -289,7 +291,8 @@ TEST_F(test_kafka_configure, expect_exception_invalid_args)
 		.Times(0);
 
 	try {
-		_pKafka->configure(&Config, _pConf);
+		// no mock _pTopic causes exception
+		KafkaConf::get(_pConfig, _pConf); 
 		FAIL() << "expected std::invalid_argument*";
 	}
 	catch(std::invalid_argument *e) {

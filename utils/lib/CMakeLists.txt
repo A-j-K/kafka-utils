@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(lib_SRCS
-	kafka.cpp
+	kafka_conf.cpp
 	kafka_event_cb.cpp
 	kafka_consume_cb.cpp
 	curler.cpp

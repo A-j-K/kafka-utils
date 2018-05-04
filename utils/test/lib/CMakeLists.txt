@@ -15,7 +15,7 @@ INCLUDE_DIRECTORIES(
 
 SET(test_SRCS
 	test-jsonconfig.cpp
-	test-kafka-configure.cpp
+	test-kafka-conf.cpp
 	test-kafka-event-cb.cpp
 	test-kafka-consume-cb.cpp
 )
