@@ -8,6 +8,7 @@ ENV DEPS_DEV_TOOLS \
 	openssh \
 	unzip \
 	file \
+	gdb \
 	git
 
 ENV DEPS_BUILD_TOOLS \

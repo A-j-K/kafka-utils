@@ -7,6 +7,8 @@ INCLUDE_DIRECTORIES(
 
 SET(main_SRCS
         main.cpp
+	event_cb.cpp
+	consume_cb.cpp
 )
 
 ADD_EXECUTABLE("${PROJECT_NAME}"

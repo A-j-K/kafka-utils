@@ -18,6 +18,7 @@ SET(test_SRCS
 	test-kafka-conf.cpp
 	test-kafka-event-cb.cpp
 	test-kafka-consume-cb.cpp
+	test-hexdump.cpp
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME}

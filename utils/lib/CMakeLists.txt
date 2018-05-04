@@ -9,6 +9,7 @@ SET(lib_SRCS
 	kafka_consume_cb.cpp
 	curler.cpp
 	curlerc.cpp
+	hexdump.cpp
 	config/abstract_config.cpp
 	config/json_config.cpp
 	config/config_factory.cpp
